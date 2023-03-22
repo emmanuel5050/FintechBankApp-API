@@ -2,7 +2,7 @@
 
 namespace FintechBankAPI.Entities
 {
-    public class AppUser:IdentityUser<int>
+    public class AppUser:IdentityUser
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
