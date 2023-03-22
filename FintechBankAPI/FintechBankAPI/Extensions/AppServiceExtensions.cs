@@ -1,5 +1,8 @@
 ﻿using FintechBankAPI.Context;
 using FintechBankAPI.Entities;
+using FintechBankAPI.Interfaces;
+using FintechBankAPI.Services;
+using FintechBankAPI.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,8 +17,8 @@ namespace FintechBankAPI.Extensions
             {
                 opt.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
             });
-            //services.AddScoped<ITokenService, TokenService>();
-            //services.AddScoped<IValidationService, ValidationService>();
+            services.AddScoped<IValidationService, ValidationService>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
 
             return services;
 
@@ -37,6 +40,12 @@ namespace FintechBankAPI.Extensions
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
             builder.AddEntityFrameworkStores<FintechApiContext>()
                 .AddDefaultTokenProviders();
+        }
+
+        public static void ConfigureAutoMappers(this IServiceCollection services)
+        {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+          
         }
     }
 }

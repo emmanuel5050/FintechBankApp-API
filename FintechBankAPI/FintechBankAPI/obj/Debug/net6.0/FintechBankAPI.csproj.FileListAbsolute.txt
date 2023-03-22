@@ -60,3 +60,5 @@ C:\Users\tdamoye\Desktop\FintechAppAPI\FintechBankApp-API\FintechBankAPI\Fintech
 C:\Users\tdamoye\Desktop\FintechAppAPI\FintechBankApp-API\FintechBankAPI\FintechBankAPI\obj\Debug\net6.0\ref\FintechBankAPI.dll
 C:\Users\tdamoye\Desktop\FintechAppAPI\FintechBankApp-API\FintechBankAPI\FintechBankAPI\bin\Debug\net6.0\Humanizer.dll
 C:\Users\tdamoye\Desktop\FintechAppAPI\FintechBankApp-API\FintechBankAPI\FintechBankAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\tdamoye\Desktop\FintechAppAPI\FintechBankApp-API\FintechBankAPI\FintechBankAPI\bin\Debug\net6.0\AutoMapper.dll
+C:\Users\tdamoye\Desktop\FintechAppAPI\FintechBankApp-API\FintechBankAPI\FintechBankAPI\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
