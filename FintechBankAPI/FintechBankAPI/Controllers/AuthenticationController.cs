@@ -15,8 +15,8 @@ namespace FintechBankAPI.Controllers
         public async Task<IActionResult> Register(RegisterDTO user)
         {
             var register = await _authRepository.Register(user);
-            if (register.Success == true) return Ok(register);
-            return BadRequest(register);
+            if (register.Success == true) return ProcessResponse(register);
+            return ProcessResponse(register);
         }
     }
 }

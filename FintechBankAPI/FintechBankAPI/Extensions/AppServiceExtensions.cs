@@ -35,6 +35,8 @@ namespace FintechBankAPI.Extensions
                 options.Password.RequireLowercase = true;
                 options.Password.RequiredLength = 8;
                 options.SignIn.RequireConfirmedEmail = true;
+                options.Lockout.AllowedForNewUsers = false;
+                
 
             });
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);

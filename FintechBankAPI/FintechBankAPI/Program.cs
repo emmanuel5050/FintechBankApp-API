@@ -1,3 +1,4 @@
+using FintechBankAPI.ApplicationConfig;
 using FintechBankAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,7 @@ builder.Services.AddAppServices(builder.Configuration);
 builder.Services.ConfigureIdentity();
 // Configure AutoMapper
 builder.Services.ConfigureAutoMappers();
-
+builder.Services.Configure<AppConfig>(builder.Configuration.GetSection("AppConfig"));
 
 var app = builder.Build();
 
