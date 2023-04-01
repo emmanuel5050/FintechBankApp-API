@@ -1,4 +1,5 @@
-﻿using FintechBankAPI.ApplicationConfig;
+﻿using AutoMapper;
+using FintechBankAPI.ApplicationConfig;
 using FintechBankAPI.Context;
 using FintechBankAPI.DTOs;
 using FintechBankAPI.Entities;
@@ -21,8 +22,9 @@ namespace FintechBankAPI.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly FintechApiContext _context;
         private readonly List<string> OtherCurrencies = new() { "EUR", "USD", "GBP" };
+        private readonly IMapper _mapper;
         public AuthRepository(FintechApiContext context, UserManager<AppUser> userManager, IHttpContextAccessor httpContext,
-            RoleManager<IdentityRole> roleManager, IValidationService validate, IOptions<AppConfig> config)
+            RoleManager<IdentityRole> roleManager, IValidationService validate, IOptions<AppConfig> config, IMapper mapper)
         {
             _validationService = validate;
             _context = context;
@@ -30,6 +32,7 @@ namespace FintechBankAPI.Services
             _httpContext = httpContext;
             _roleManager = roleManager;
             _config = config.Value;
+            _mapper= mapper;
         }
 
         public async Task<Response> Register(RegisterDTO user)
@@ -39,14 +42,14 @@ namespace FintechBankAPI.Services
             if (errors.Any()) return new ErrorResponse { Message = $"Unable to register customer: {errors.FirstOrDefault().Value}", Content = errors };
             var existingNin = await _context.Customers.AnyAsync(c => c.NinNo == user.NinNo);
             if(existingNin) return new ErrorResponse { Message="Customer already exist"};
-            var newUser = mapInitializer.regMapper.Map<RegisterDTO, AppUser>(user);
+            var newUser = _mapper.Map<AppUser>(user); //mapInitializer.regMapper.Map<RegisterDTO, AppUser>(user);
             var createIdentityUser= await _userManager.CreateAsync(newUser,user.Password);
             var roles = await _roleManager.Roles.ToListAsync();
             if(roles.Count==0)  await _roleManager.CreateAsync(new IdentityRole { Name = "Customer" });
             if (createIdentityUser.Succeeded)
             {
                 await _userManager.AddToRoleAsync(newUser, "Customer");
-                var newCustomer = mapInitializer.regMapper.Map<RegisterDTO, Customer>(user);
+                var newCustomer = _mapper.Map<Customer>(user); //mapInitializer.regMapper.Map<RegisterDTO, Customer>(user);
                 var currencies = await _context.Currencies.ToListAsync();
                 if (currencies.Count == 0)
                 {
@@ -77,13 +80,39 @@ namespace FintechBankAPI.Services
                 }
                 await _context.Customers.AddAsync(newCustomer);
                 int CustSaved = await _context.SaveChangesAsync();
-                if (CustSaved <0)
-                
+                if (CustSaved < 0) return new ErrorResponse { Message = "Unable to create customer" };
+                Account acct = new()
+                {
+                    AccountNumber = accountNo.ToString(),
+                    Balance = 0,
+                    CurrencyId = currency.Id,
+                    CustomerId = newCustomer.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _context.Accounts.AddAsync(acct);
+                int accountSaved = await _context.SaveChangesAsync();
+                if (accountSaved <= 0)
+                {
+                    _context.Customers.Remove(newCustomer);
+                    await _context.SaveChangesAsync();
+                    return new ErrorResponse
+                    {
+                        Message = "Unable to create account for customer."
+                    };
 
-                return new SuccessResponse { Success = true, Status = (int)HttpStatusCode.Created };
+                }
+
+
+                return new SuccessResponse
+                {
+                    Success = true,
+                    Status = (int)HttpStatusCode.Created,
+                    Message = "Customer Created Successfully",
+                    Content = new CreateCustomerResponse { AccountNumber = accountNo.ToString(), CustomerNumber = customerNo.ToString() }
+                };
             };
-
             return new ErrorResponse { Message = createIdentityUser.Errors.FirstOrDefault().Description, Status = (int)HttpStatusCode.UnprocessableEntity };
+
         }
 
 

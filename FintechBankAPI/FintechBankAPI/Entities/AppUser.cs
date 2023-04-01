@@ -10,7 +10,7 @@ namespace FintechBankAPI.Entities
         public int Age { get; set; }
         public bool IsActive { get; set; }
         public string? PublicId { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; }
         public string RefreshToken { get; set; } = String.Empty;
         public DateTime RefreshTokenExpiryTime { get; set; }
